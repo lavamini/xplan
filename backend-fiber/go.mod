@@ -2,7 +2,10 @@ module backend-fiber
 
 go 1.23.3
 
-require github.com/gofiber/fiber/v2 v2.52.6
+require (
+	github.com/gofiber/fiber/v2 v2.52.6
+	github.com/jessevdk/go-flags v1.6.1
+)
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
