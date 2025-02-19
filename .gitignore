@@ -1,3 +1,4 @@
 .DS_Store
 
 backend-axum/target
+backend-koa/node_modules
