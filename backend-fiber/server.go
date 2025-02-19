@@ -22,7 +22,9 @@ func main() {
 	}
 
 	port := opt.Port
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		DisableStartupMessage: true,
+	})
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, fiber server")
