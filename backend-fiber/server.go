@@ -22,6 +22,7 @@ func main() {
 	}
 
 	port := opt.Port
+
 	app := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 	})
