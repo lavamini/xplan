@@ -1,0 +1,21 @@
+services:
+  # DB service
+  db:
+    image: mysql:8.0.41
+    ports:
+      - 3306:3306
+    environment:
+      # NOTE: Please UPDATE THIS PASSWORD!
+      MYSQL_ROOT_PASSWORD: testpass
+      MYSQL_DATABASE: xplan
+    volumes:
+    # Init DB
+      - ./db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [
+        "CMD-SHELL",
+        "sh -c 'mysqladmin ping -u root -p$${MYSQL_ROOT_PASSWORD}'"
+      ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
