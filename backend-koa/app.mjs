@@ -3,6 +3,8 @@ import Router from '@koa/router';
 import { bodyParser } from '@koa/bodyparser';
 import { program } from 'commander';
 
+import controller from './controller.mjs';
+
 program
     .option('-p, --port <port number>')
     .parse();
@@ -16,11 +18,8 @@ const router = new Router();
 // Parse request.body
 app.use(bodyParser());
 
-// Set handle /
-router.get('/', async (ctx, next) => {
-    ctx.response.type = 'text/plain';
-    ctx.response.body = 'Hello, koa server';
-});
+// Import controller
+app.use(await controller());
 
 // Use router
 app.use(router.routes());
