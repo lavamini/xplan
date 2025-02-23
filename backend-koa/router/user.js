@@ -1,5 +1,10 @@
-// POST /signin
-async function signin(ctx, next) {
+const Router = require('koa-router');
+
+const router = new Router();
+router.prefix('/api');
+
+// signin
+router.post('/signin', (ctx, next) => {
     let name = ctx.request.body.name || '';
     let password = ctx.request.body.password || '';
 
@@ -14,8 +19,6 @@ async function signin(ctx, next) {
             msg: 'Success'
         };
     }
-}
+});
 
-export default {
-    'POST /api/signin': signin
-};
+module.exports = router;

@@ -1,8 +1,10 @@
 {
 	"dependencies": {
-		"@koa/bodyparser": "^5.1.1",
-		"@koa/router": "^13.1.0",
 		"commander": "^13.1.0",
-		"koa": "^2.15.4"
+		"glob": "^11.0.1",
+		"koa": "^2.15.4",
+		"koa-bodyparser": "^4.4.1",
+		"koa-compose": "^4.1.0",
+		"koa-router": "^13.0.1"
 	}
 }
