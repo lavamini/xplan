@@ -1,11 +1,11 @@
 CREATE TABLE user (
-    `id` BIGINT UNSIGNED NOT NULL,
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 
     `name` VARBINARY(32) NOT NULL,
     `password_hash` VARBINARY(254) NOT NULL,
 
-    `created_at` DATETIME(6) NOT NULL,
-    `updated_at` DATETIME(6) NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
 
     PRIMARY KEY (id),
     UNIQUE KEY (name),
