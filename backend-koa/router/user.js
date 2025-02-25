@@ -134,4 +134,37 @@ router.post('/signup', async (ctx, next) => {
     }
 });
 
+// users
+router.get('/users', async (ctx, next) => {
+    // async db query
+    const results = await new Promise(resolve => {
+        ctx.db_pool.query(
+            'SELECT id, name, created_at, updated_at FROM user',
+            (error, results, fields) => {
+                if (error) {
+                    console.warn(error);
+                    resolve(undefined);
+                }
+                resolve(results);
+            }
+        );
+    });
+
+    if (results == undefined) {
+        ctx.body = { code: 1, msg: 'get users failed' };
+    } else {
+        for (let i in results) {
+            results[i].name = results[i].name.toString();
+            results[i].created_at = moment(results[i].created_at).format('YYYY-MM-DD HH:mm:ss');
+            results[i].updated_at = moment(results[i].updated_at).format('YYYY-MM-DD HH:mm:ss');
+        }
+
+        ctx.body = {
+            code: 0,
+            data: results,
+            msg: 'success'
+        }
+    }
+});
+
 module.exports = router;
