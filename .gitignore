@@ -1,4 +1,5 @@
 .DS_Store
 
 backend-axum/target
+backend-fiber/main
 backend-koa/node_modules
