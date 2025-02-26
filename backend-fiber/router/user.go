@@ -2,6 +2,7 @@ package router
 
 import (
 	"backend-fiber/database"
+	"database/sql"
 	"fmt"
 	"strings"
 	"time"
@@ -21,6 +22,7 @@ func (u *User) SetupRouter(app *fiber.App) {
 	user := app.Group("/api")
 	user.Post("/signin", u.signin)
 	user.Post("/signup", u.signup)
+	user.Get("/users", u.users)
 }
 
 // user form
@@ -146,4 +148,49 @@ func (u *User) signup(c *fiber.Ctx) error {
 			}
 		}
 	}
+}
+
+// user entity
+type UserEntity struct {
+	Id        uint64 `json:"id"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+// users
+func (u *User) users(c *fiber.Ctx) error {
+	rows, err := database.Db.Query("SELECT id, name, created_at, updated_at FROM user")
+	if err != nil {
+		fmt.Printf("select users error: %s\n", err.Error())
+		return c.JSON(fiber.Map{
+			"code": 1,
+			"msg":  "select users failed",
+		})
+	}
+
+	var userEntityArray []UserEntity
+
+	for rows.Next() {
+		var id uint64
+		var name string
+		var created_at, updated_at sql.NullTime
+
+		rows.Scan(&id, &name, &created_at, &updated_at)
+
+		userEntity := UserEntity{
+			Id:        id,
+			Name:      name,
+			CreatedAt: created_at.Time.Format("2006-01-02 15:04:05"),
+			UpdatedAt: updated_at.Time.Format("2006-01-02 15:04:05"),
+		}
+
+		userEntityArray = append(userEntityArray, userEntity)
+	}
+
+	return c.JSON(fiber.Map{
+		"code": 1,
+		"data": userEntityArray,
+		"msg":  "success",
+	})
 }
