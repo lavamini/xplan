@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-axum = "0.8.1"
-structopt = "0.3.26"
-tokio = { version = "1.43.0", features = ["full"] }
+axum = "0.8"
+num_cpus = "1.16"
+serde = "1.0"
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "any", "mysql"] }
+structopt = "0.3"
+tokio = { version = "1.0", features = ["full"] }
+toml = "0.8"
