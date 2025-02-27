@@ -5,6 +5,7 @@ use axum::{
 };
 use sqlx::MySqlPool;
 use structopt::StructOpt;
+use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod config;
 mod database;
@@ -20,6 +21,14 @@ struct Cli {
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::registry()
+        .with(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| format!("{}=debug", env!("CARGO_CRATE_NAME")).into()),
+        )
+        .with(tracing_subscriber::fmt::layer())
+        .init();
+
     let args = Cli::from_args();
     let port = &args.port;
 
@@ -41,7 +50,7 @@ async fn main() {
         .await
         .unwrap();
 
-    println!("⇨ axum server listening on \x1b[32m{}\x1b[0m", port);
+    tracing::info!("axum server listening on {}", port);
     axum::serve(listener, app).await.unwrap();
 }
 

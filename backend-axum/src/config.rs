@@ -18,15 +18,22 @@ pub struct Config {
 }
 
 pub fn load_config(file_path: &str) -> Config {
+    tracing::debug!("loading config file ...");
     let mut file = match File::open(file_path) {
         Ok(f) => f,
-        Err(e) => panic!("No such file {} exception: {}", file_path, e)
+        Err(_) => {
+            tracing::error!("can't read config file: {}", file_path);
+            std::process::exit(1);
+        }
     };
 
     let mut str_val = String::new();
     match file.read_to_string(&mut str_val) {
         Ok(s) => s,
-        Err(e) => panic!("Error reading file: {}", e)
+        Err(_) => {
+            tracing::error!("can't read config file: {}", file_path);
+            std::process::exit(1);
+        }
     };
 
     let config: Config = toml::from_str(&str_val).unwrap();
