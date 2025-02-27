@@ -8,6 +8,6 @@ cargo run
 ### produce
 ```sh
 cargo build --release
-cp ./target/release/api-proxy-rs ./main
+cp ./target/release/backend-axum ./main
 ./main
 ```
