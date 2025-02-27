@@ -1,22 +1,17 @@
 package database
 
 import (
-	"backend-fiber/config"
 	"database/sql"
-	"fmt"
 
 	"github.com/shirou/gopsutil/cpu"
 )
 
 var Db *sql.DB
 
-func InitDatabase(config config.Db) error {
+// conn_str: user:password@tcp(host:port)/database?loc=Local&parseTime=true
+func InitDatabase(connStr string) error {
 	// 获取 cpu 核心数（不包括超线程）
 	numCPU, _ := cpu.Counts(false)
-
-	// mysql
-	connStr := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?loc=Local&parseTime=true",
-		config.User, config.Password, config.Host, config.Port, config.Database)
 
 	var err error
 	Db, err = sql.Open("mysql", connStr)

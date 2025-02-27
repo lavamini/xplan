@@ -28,7 +28,8 @@ async fn main() {
 
     // init db pool
     let db = config.db;
-    let db_conn_str = format!("mysql://{}:{}@{}:{}/{}", db.user, db.password, db.host, db.port, db.database);
+    let db_conn_str = format!("mysql://{}:{}@{}:{}/{}",
+        db.user, db.password, db.host, db.port, db.database);
     let pool = init_db_pool(db_conn_str.as_str()).await;
 
     // build our application with a route
