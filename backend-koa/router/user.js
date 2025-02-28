@@ -22,7 +22,7 @@ router.post('/signin', async (ctx, next) => {
                 "SELECT password_hash FROM user WHERE name='" + name + "'",
                 (error, results, fields) => {
                     if (error) {
-                        console.warn(error);
+                        console.error('select user error: ' + error);
                         resolve(undefined);
                     }
                     resolve(results);
@@ -75,7 +75,7 @@ router.post('/signup', async (ctx, next) => {
                 "SELECT id FROM user WHERE name='" + name + "'",
                 (error, results, fields) => {
                     if (error) {
-                        console.warn(error);
+                        console.error('select user error: ' + error);
                         resolve(-1);
                     }
                     resolve(results.length);
@@ -116,7 +116,7 @@ router.post('/signup', async (ctx, next) => {
                         'INSERT INTO user SET ?', user,
                         (error, results, fields) => {
                             if (error) {
-                                console.warn(error);
+                                console.error('insert user error: ' + error);
                                 resolve(0);
                             }
                             resolve(results.insertId);
@@ -142,7 +142,7 @@ router.get('/users', async (ctx, next) => {
             'SELECT id, name, created_at, updated_at FROM user',
             (error, results, fields) => {
                 if (error) {
-                    console.warn(error);
+                    console.error('select user error: ' + error);
                     resolve(undefined);
                 }
                 resolve(results);

@@ -1,10 +1,10 @@
 use axum::{
     extract::State,
     Json,
-    routing::post,
+    routing::{get, post},
     Router
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::{MySqlPool, Row};
 
@@ -12,7 +12,8 @@ use sqlx::{MySqlPool, Row};
 pub fn init_router() -> Router<MySqlPool> {
     let app = Router::new()
         .route("/signin", post(signin))
-        .route("/signup", post(signup));
+        .route("/signup", post(signup))
+        .route("/users", get(users));
     Router::new()
         .nest("/api", app)
 }
@@ -143,6 +144,56 @@ pub async fn signup(
             return Json(json!({
                 "code": 1,
                 "msg": "signup failed"
+            }))
+        }
+    }
+}
+
+// user entity
+#[derive(Serialize)]
+pub struct UserEntity {
+    id: u64,
+    name: String,
+    created_at: String,
+    updated_at: String
+}
+
+// users
+pub async fn users(
+    State(pool): State<MySqlPool>
+) -> Json<serde_json::Value> {
+    let result = sqlx::query("SELECT id, name, created_at, updated_at FROM user")
+        .map(|row: sqlx::mysql::MySqlRow| {
+            let name: Vec<u8> = row.get(1);
+            let name = String::from_utf8(name).unwrap();
+            let created_at: chrono::DateTime<chrono::Utc> = row.get(2);
+            let created_at = created_at.format("%Y-%m-%d %H:%M:%S").to_string();
+            let updated_at: chrono::DateTime<chrono::Utc> = row.get(3);
+            let updated_at = updated_at.format("%Y-%m-%d %H:%M:%S").to_string();
+
+            UserEntity {
+                id: row.get(0),
+                name,
+                created_at,
+                updated_at
+            }
+        })
+        .fetch_all(&pool)
+        .await;
+
+    match result {
+        Ok(data) => {
+            return Json(json!({
+                "code": 0,
+                "data": data,
+                "msg": "success"
+            }))
+        },
+        Err(err) => {
+            tracing::error!("select user error: {}", err.to_string());
+            return Json(json!({
+                "code": 1,
+                "msg": "select users failed"
             }))
         }
     }

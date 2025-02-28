@@ -54,7 +54,7 @@ func (u *User) signin(c *fiber.Ctx) error {
 
 	rows, err := database.Db.Query("SELECT password_hash FROM user WHERE name = ?", name)
 	if err != nil {
-		fmt.Printf("select password_hash error: %s\n", err.Error())
+		fmt.Printf("select user error: %s\n", err.Error())
 		return c.JSON(fiber.Map{
 			"code": 1,
 			"msg":  "signin failed",
@@ -110,7 +110,7 @@ func (u *User) signup(c *fiber.Ctx) error {
 
 	rows, err := database.Db.Query("SELECT id FROM user WHERE name = ?", name)
 	if err != nil {
-		fmt.Printf("select id error: %s\n", err.Error())
+		fmt.Printf("select user error: %s\n", err.Error())
 		return c.JSON(fiber.Map{
 			"code": 1,
 			"msg":  "signup failed",
@@ -136,6 +136,7 @@ func (u *User) signup(c *fiber.Ctx) error {
 
 			_, err := database.Db.Exec("INSERT INTO user(name, password_hash, created_at, updated_at) VALUES(?, ?, ?, ?)", name, password_pash, created_at, updated_at)
 			if err != nil {
+				fmt.Printf("insert user error: %s\n", err.Error())
 				return c.JSON(fiber.Map{
 					"code": 1,
 					"msg":  "signup failed",
