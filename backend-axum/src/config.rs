@@ -21,8 +21,8 @@ pub fn load_config(file_path: &str) -> Config {
     tracing::debug!("loading config file ...");
     let mut file = match File::open(file_path) {
         Ok(f) => f,
-        Err(_) => {
-            tracing::error!("can't read config file: {}", file_path);
+        Err(err) => {
+            tracing::error!("can't read config file: {}", err.to_string());
             std::process::exit(1);
         }
     };
@@ -30,8 +30,8 @@ pub fn load_config(file_path: &str) -> Config {
     let mut str_val = String::new();
     match file.read_to_string(&mut str_val) {
         Ok(s) => s,
-        Err(_) => {
-            tracing::error!("can't read config file: {}", file_path);
+        Err(err) => {
+            tracing::error!("can't read config file: {}", err.to_string());
             std::process::exit(1);
         }
     };

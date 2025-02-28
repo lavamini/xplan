@@ -38,7 +38,7 @@ func (u *User) signin(c *fiber.Ctx) error {
 	if err := c.BodyParser(userForm); err != nil {
 		return c.JSON(fiber.Map{
 			"code": 1,
-			"msg":  "Parameters missing",
+			"msg":  "parameters missing",
 		})
 	}
 
@@ -48,7 +48,7 @@ func (u *User) signin(c *fiber.Ctx) error {
 	if name == "" || password == "" {
 		return c.JSON(fiber.Map{
 			"code": 1,
-			"msg":  "Parameters missing",
+			"msg":  "parameters missing",
 		})
 	}
 
@@ -93,7 +93,7 @@ func (u *User) signup(c *fiber.Ctx) error {
 	if err := c.BodyParser(userForm); err != nil {
 		return c.JSON(fiber.Map{
 			"code": 1,
-			"msg":  "Parameters missing",
+			"msg":  "parameters missing",
 		})
 	}
 
@@ -103,7 +103,7 @@ func (u *User) signup(c *fiber.Ctx) error {
 	if name == "" || password == "" {
 		return c.JSON(fiber.Map{
 			"code": 1,
-			"msg":  "Parameters missing",
+			"msg":  "parameters missing",
 		})
 	}
 

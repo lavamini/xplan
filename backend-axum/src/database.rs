@@ -15,8 +15,8 @@ pub async fn init_db_pool(conn_str: &str) -> Pool<MySql> {
 
     let pool = match pool {
         Ok(pool) => pool,
-        Err(_) => {
-            tracing::error!("can't connect to database");
+        Err(err) => {
+            tracing::error!("can't connect to database: {}", err.to_string());
             std::process::exit(1);
         }
     };

@@ -14,7 +14,7 @@ router.post('/signin', async (ctx, next) => {
     password = password.trim();
 
     if (name == '' || password == '') {
-        ctx.body = { code: 1, msg: 'Parameters missing' };
+        ctx.body = { code: 1, msg: 'parameters missing' };
     } else {
         // async db query
         const results = await new Promise(resolve => {
@@ -67,7 +67,7 @@ router.post('/signup', async (ctx, next) => {
     password = password.trim();
 
     if (name == '' || password == '') {
-        ctx.body = { code: 1, msg: 'Parameters missing' };
+        ctx.body = { code: 1, msg: 'parameters missing' };
     } else {
         // async db query
         const match_rows = await new Promise(resolve => {
