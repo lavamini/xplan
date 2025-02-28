@@ -9,7 +9,7 @@ bcrypt = "0.17"
 chrono = "0.4"
 num_cpus = "1.16"
 serde = "1.0"
-serde_json = "1.0"
+serde_json = { version = "1.0", features = ["preserve_order"] }
 sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "chrono", "mysql"] }
 structopt = "0.3"
 tokio = { version = "1.0", features = ["full"] }
