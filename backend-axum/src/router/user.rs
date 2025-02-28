@@ -11,7 +11,8 @@ use sqlx::{MySqlPool, Row};
 // init router
 pub fn init_router() -> Router<MySqlPool> {
     let app = Router::new()
-        .route("/signin", post(signin));
+        .route("/signin", post(signin))
+        .route("/signup", post(signup));
     Router::new()
         .nest("/api", app)
 }
@@ -57,7 +58,7 @@ pub async fn signin(
             }))
         },
         Err(err) => {
-            tracing::error!("select password_hash error: {}", err.to_string());
+            tracing::error!("select user error: {}", err.to_string());
             return Json(json!({
                 "code": 1,
                 "msg": "signin failed"
@@ -76,5 +77,73 @@ pub async fn signin(
             "code": 1,
             "msg": "name or password not correct"
         }))
+    }
+}
+
+// signup
+pub async fn signup(
+    State(pool): State<MySqlPool>,
+    Json(user_form): Json<UserForm>
+) -> Json<serde_json::Value> {
+    let name = user_form.name.trim();
+    let password = user_form.password.trim();
+
+    if name == "" || password == "" {
+        return Json(json!({
+            "code": 1,
+            "msg": "parameters missing"
+        }))
+    }
+
+    let result = sqlx::query("SELECT id FROM user WHERE name = ?")
+        .bind(name)
+        .fetch_one(&pool)
+        .await;
+
+    match result {
+        Ok(_) => {
+            return Json(json!({
+                "code": 1,
+                "msg": "name already exist"
+            }))
+        },
+        Err(sqlx::Error::RowNotFound) => {
+            // just skip
+        },
+        Err(err) => {
+            tracing::error!("select user error: {}", err.to_string());
+            return Json(json!({
+                "code": 1,
+                "msg": "signup failed"
+            }))
+        }
+    };
+
+    let password_hash = bcrypt::hash(password, 10).unwrap();
+    let created_at = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+    let updated_at = created_at.clone();
+
+    let result = sqlx::query("INSERT INTO user(name, password_hash, created_at, updated_at) VALUES(?, ?, ?, ?)")
+        .bind(name)
+        .bind(password_hash)
+        .bind(created_at)
+        .bind(updated_at)
+        .execute(&pool)
+        .await;
+
+    match result {
+        Ok(_) => {
+            return Json(json!({
+                "code": 0,
+                "msg": "signup success"
+            }))
+        },
+        Err(err) => {
+            tracing::error!("insert user error: {}", err.to_string());
+            return Json(json!({
+                "code": 1,
+                "msg": "signup failed"
+            }))
+        }
     }
 }
