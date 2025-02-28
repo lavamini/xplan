@@ -60,6 +60,7 @@ func (u *User) signin(c *fiber.Ctx) error {
 			"msg":  "signin failed",
 		})
 	}
+	defer rows.Close()
 
 	if rows.Next() {
 		var password_hash string
