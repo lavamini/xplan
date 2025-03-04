@@ -3,6 +3,9 @@ name = "backend-axum"
 version = "0.1.0"
 edition = "2021"
 
+[profile.release]
+strip = "symbols"
+
 [dependencies]
 axum = "0.8"
 bcrypt = "0.17"
