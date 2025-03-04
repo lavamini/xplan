@@ -13,3 +13,25 @@ docker compose up -d
 --- or ---
 ./run.sh koa
 ```
+
+### api
+```sh
+GET http://localhost:3000/
+```
+```sh
+POST http://localhost:3000/api/signup
+{
+    "name": "Jay",
+    "password": "testpass"
+}
+```
+```sh
+POST http://localhost:3000/api/signin
+{
+    "name": "Jay",
+    "password": "testpass"
+}
+```
+```sh
+GET http://localhost:3000/api/users
+```
