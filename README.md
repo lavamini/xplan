@@ -2,9 +2,9 @@
 
 ### produce
 ```sh
-./run axum
+./run.sh axum
 or
-./run fiber
+./run.sh fiber
 or
-./run koa
+./run.sh koa
 ```
