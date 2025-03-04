@@ -5,7 +5,7 @@
 docker compose up -d
 ```
 
-### produce
+### run
 ```sh
 ./run.sh axum
 --- or ---
