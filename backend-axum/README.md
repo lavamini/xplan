@@ -9,5 +9,5 @@ cargo run
 ```sh
 cargo build --release
 cp ./target/release/backend-axum ./main
-./main
+RUST_LOG=info ./main
 ```
