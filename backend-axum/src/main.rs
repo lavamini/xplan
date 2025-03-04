@@ -46,6 +46,6 @@ async fn main() {
         .await
         .unwrap();
 
-    tracing::info!("axum server listening on {}", port);
+    tracing::info!("⇨ axum server listening on \x1b[32m{}\x1b[0m", port);
     axum::serve(listener, app).await.unwrap();
 }
