@@ -163,26 +163,31 @@ pub async fn users(
     State(pool): State<MySqlPool>
 ) -> Json<serde_json::Value> {
     let result = sqlx::query("SELECT id, name, created_at, updated_at FROM user")
-        .map(|row: sqlx::mysql::MySqlRow| {
-            let name: Vec<u8> = row.get(1);
-            let name = String::from_utf8(name).unwrap();
-            let created_at: chrono::DateTime<chrono::Utc> = row.get(2);
-            let created_at = created_at.format("%Y-%m-%d %H:%M:%S").to_string();
-            let updated_at: chrono::DateTime<chrono::Utc> = row.get(3);
-            let updated_at = updated_at.format("%Y-%m-%d %H:%M:%S").to_string();
-
-            UserEntity {
-                id: row.get(0),
-                name,
-                created_at,
-                updated_at
-            }
-        })
         .fetch_all(&pool)
         .await;
 
     match result {
-        Ok(data) => {
+        Ok(result) => {
+            let mut data: Vec<UserEntity> = vec![];
+
+            for row in result {
+                let name: Vec<u8> = row.get(1);
+                let name = String::from_utf8(name).unwrap();
+                let created_at: chrono::DateTime<chrono::Utc> = row.get(2);
+                let created_at = created_at.format("%Y-%m-%d %H:%M:%S").to_string();
+                let updated_at: chrono::DateTime<chrono::Utc> = row.get(3);
+                let updated_at = updated_at.format("%Y-%m-%d %H:%M:%S").to_string();
+
+                let entity = UserEntity {
+                    id: row.get(0),
+                    name,
+                    created_at,
+                    updated_at
+                };
+
+                data.push(entity);
+            }
+
             return Json(json!({
                 "code": 0,
                 "data": data,

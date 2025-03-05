@@ -171,7 +171,7 @@ func (u *User) users(c *fiber.Ctx) error {
 		})
 	}
 
-	var userEntityArray []UserEntity
+	userEntityArray := []UserEntity{}
 
 	for rows.Next() {
 		var id uint64
