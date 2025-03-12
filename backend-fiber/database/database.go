@@ -19,6 +19,7 @@ func InitDatabase(connStr string) error {
 		return err
 	}
 	// 设置连接池大小
+	Db.SetMaxIdleConns(numCPU*2 + 1)
 	Db.SetMaxOpenConns(numCPU*2 + 1)
 	return nil
 }

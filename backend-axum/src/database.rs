@@ -8,6 +8,7 @@ pub async fn init_db_pool(conn_str: &str) -> Pool<MySql> {
 	let cpus = num_cpus::get_physical() as u32;
 
     let pool = MySqlPoolOptions::new()
+        .min_connections(cpus * 2 + 1)
         .max_connections(cpus * 2 + 1)
         .acquire_timeout(Duration::from_secs(3))
         .connect(&conn_str)
