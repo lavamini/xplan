@@ -191,7 +191,7 @@ func (u *User) users(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"code": 1,
+		"code": 0,
 		"data": userEntityArray,
 		"msg":  "success",
 	})
