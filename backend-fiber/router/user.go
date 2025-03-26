@@ -162,7 +162,16 @@ type UserEntity struct {
 
 // users
 func (u *User) users(c *fiber.Ctx) error {
-	rows, err := database.Db.Query("SELECT id, name, created_at, updated_at FROM user LIMIT 20")
+	params := new(Pagination)
+	if err := c.QueryParser(params); err != nil {
+		return c.JSON(fiber.Map{
+			"code": 1,
+			"msg":  "invalid parameters",
+		})
+	}
+
+	_, page_size, offset := ParsePagination(params)
+	rows, err := database.Db.Query("SELECT id, name, created_at, updated_at FROM user LIMIT ?,?", offset, page_size)
 	if err != nil {
 		fmt.Printf("select users error: %s\n", err.Error())
 		return c.JSON(fiber.Map{

@@ -32,7 +32,16 @@ type EmployeeEntity struct {
 
 // employees
 func (u *Employee) employees(c *fiber.Ctx) error {
-	rows, err := database.Db.Query("SELECT emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee LIMIT 20000,20")
+	params := new(Pagination)
+	if err := c.QueryParser(params); err != nil {
+		return c.JSON(fiber.Map{
+			"code": 1,
+			"msg":  "invalid parameters",
+		})
+	}
+
+	_, page_size, offset := ParsePagination(params)
+	rows, err := database.Db.Query("SELECT emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee LIMIT ?,?", offset, page_size)
 	if err != nil {
 		fmt.Printf("select employees error: %s\n", err.Error())
 		return c.JSON(fiber.Map{

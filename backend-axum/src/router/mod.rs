@@ -43,6 +43,5 @@ fn parse_pagination(params: Pagination) -> (i32, i32, i32) {
     }
 
     let offset = (page - 1) * page_size;
-
     return (page, page_size, offset);
 }
