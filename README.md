@@ -33,5 +33,8 @@ POST http://localhost:3000/api/signin
 }
 ```
 ```sh
-GET http://localhost:3000/api/users
+GET http://localhost:3000/api/users?page=1&page_size=20
+```
+```sh
+GET http://localhost:3000/api/employees?page=1&page_size=20
 ```

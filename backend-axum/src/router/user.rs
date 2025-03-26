@@ -1,5 +1,5 @@
 use axum::{
-    extract::State,
+    extract::{Query, State},
     Json,
     routing::{get, post},
     Router
@@ -7,6 +7,8 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::{MySql, MySqlPool, Row};
+
+use super::{parse_pagination, Pagination};
 
 // init router
 pub fn init_router() -> Router<MySqlPool> {
@@ -160,9 +162,15 @@ struct User {
 
 // users
 async fn users(
-    State(pool): State<MySqlPool>
+    State(pool): State<MySqlPool>,
+    Query(params): Query<Pagination>
 ) -> Json<serde_json::Value> {
-    let result = sqlx::query_as::<MySql, User>("SELECT id, CAST(name as CHAR) as name, created_at, updated_at FROM user LIMIT 20")
+    // parse pagination
+    let (_, page_size, offset) = parse_pagination(params);
+
+    let result = sqlx::query_as::<MySql, User>("SELECT t1.id, CAST(name as CHAR) as name, created_at, updated_at FROM user t1 INNER JOIN (SELECT id FROM user ORDER BY id LIMIT ?,?) t2 ON t1.id = t2.id")
+        .bind(offset)
+        .bind(page_size)
         .fetch_all(&pool)
         .await;
 
