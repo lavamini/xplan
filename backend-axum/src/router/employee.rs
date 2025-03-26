@@ -31,7 +31,7 @@ pub struct EmployeeEntity {
 pub async fn employees(
     State(pool): State<MySqlPool>
 ) -> Json<serde_json::Value> {
-    let result = sqlx::query("SELECT emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee limit 20")
+    let result = sqlx::query("SELECT emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee LIMIT 20")
         .fetch_all(&pool)
         .await;
 
