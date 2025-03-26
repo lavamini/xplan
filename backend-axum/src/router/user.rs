@@ -173,9 +173,9 @@ pub async fn users(
             for row in result {
                 let name: Vec<u8> = row.get(1);
                 let name = String::from_utf8(name).unwrap();
-                let created_at: chrono::DateTime<chrono::Utc> = row.get(2);
+                let created_at: chrono::NaiveDateTime = row.get(2);
                 let created_at = created_at.format("%Y-%m-%d %H:%M:%S").to_string();
-                let updated_at: chrono::DateTime<chrono::Utc> = row.get(3);
+                let updated_at: chrono::NaiveDateTime = row.get(3);
                 let updated_at = updated_at.format("%Y-%m-%d %H:%M:%S").to_string();
 
                 let entity = UserEntity {
@@ -195,7 +195,7 @@ pub async fn users(
             }))
         },
         Err(err) => {
-            tracing::error!("select user error: {}", err.to_string());
+            tracing::error!("select users error: {}", err.to_string());
             return Json(json!({
                 "code": 1,
                 "msg": "select users failed"
