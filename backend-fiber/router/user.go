@@ -162,7 +162,7 @@ type UserEntity struct {
 
 // users
 func (u *User) users(c *fiber.Ctx) error {
-	rows, err := database.Db.Query("SELECT id, name, created_at, updated_at FROM user")
+	rows, err := database.Db.Query("SELECT id, name, created_at, updated_at FROM user LIMIT 20")
 	if err != nil {
 		fmt.Printf("select users error: %s\n", err.Error())
 		return c.JSON(fiber.Map{

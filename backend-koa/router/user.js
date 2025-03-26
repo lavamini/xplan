@@ -139,7 +139,7 @@ router.get('/users', async (ctx, next) => {
     // async db query
     const results = await new Promise(resolve => {
         ctx.db_pool.query(
-            'SELECT id, name, created_at, updated_at FROM user',
+            'SELECT id, name, created_at, updated_at FROM user LIMIT 20',
             (error, results, fields) => {
                 if (error) {
                     console.error('select user error: ' + error);

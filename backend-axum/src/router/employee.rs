@@ -6,7 +6,7 @@ use axum::{
 };
 use serde::Serialize;
 use serde_json::json;
-use sqlx::{MySqlPool, Row};
+use sqlx::{MySql, MySqlPool};
 
 // init router
 pub fn init_router() -> Router<MySqlPool> {
@@ -17,46 +17,26 @@ pub fn init_router() -> Router<MySqlPool> {
 }
 
 // employee entity
-#[derive(Serialize)]
-pub struct EmployeeEntity {
+#[derive(Serialize, sqlx::FromRow)]
+struct Employee {
     emp_no: i32,
-    birth_date: String,
+    birth_date: chrono::NaiveDate,
     first_name: String,
     last_name: String,
     gender: String,
-    hire_date: String
+    hire_date: chrono::NaiveDate
 }
 
 // employees
-pub async fn employees(
+async fn employees(
     State(pool): State<MySqlPool>
 ) -> Json<serde_json::Value> {
-    let result = sqlx::query("SELECT emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee LIMIT 20")
+    let result = sqlx::query_as::<MySql, Employee>("SELECT emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee LIMIT 20")
         .fetch_all(&pool)
         .await;
 
     match result {
-        Ok(result) => {
-            let mut data: Vec<EmployeeEntity> = vec![];
-
-            for row in result {
-                let birth_date: chrono::NaiveDate = row.get(1);
-                let birth_date = birth_date.format("%Y-%m-%d").to_string();
-                let hire_date: chrono::NaiveDate = row.get(5);
-                let hire_date = hire_date.format("%Y-%m-%d").to_string();
-
-                let entity = EmployeeEntity {
-                    emp_no: row.get(0),
-                    birth_date,
-                    first_name: row.get(2),
-                    last_name: row.get(3),
-                    gender: row.get(4),
-                    hire_date
-                };
-
-                data.push(entity);
-            }
-
+        Ok(data) => {
             return Json(json!({
                 "code": 0,
                 "data": data,

@@ -6,7 +6,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::{MySqlPool, Row};
+use sqlx::{MySql, MySqlPool, Row};
 
 // init router
 pub fn init_router() -> Router<MySqlPool> {
@@ -20,7 +20,7 @@ pub fn init_router() -> Router<MySqlPool> {
 
 // user form
 #[derive(Deserialize)]
-pub struct UserForm {
+struct UserForm {
     #[serde(default)]
     name: String,
     #[serde(default)]
@@ -28,7 +28,7 @@ pub struct UserForm {
 }
 
 // signin
-pub async fn signin(
+async fn signin(
     State(pool): State<MySqlPool>,
     Json(user_form): Json<UserForm>
 ) -> Json<serde_json::Value> {
@@ -82,7 +82,7 @@ pub async fn signin(
 }
 
 // signup
-pub async fn signup(
+async fn signup(
     State(pool): State<MySqlPool>,
     Json(user_form): Json<UserForm>
 ) -> Json<serde_json::Value> {
@@ -150,44 +150,24 @@ pub async fn signup(
 }
 
 // user entity
-#[derive(Serialize)]
-pub struct UserEntity {
+#[derive(Serialize, sqlx::FromRow)]
+struct User {
     id: u64,
     name: String,
-    created_at: String,
-    updated_at: String
+    created_at: chrono::NaiveDateTime,
+    updated_at: chrono::NaiveDateTime
 }
 
 // users
-pub async fn users(
+async fn users(
     State(pool): State<MySqlPool>
 ) -> Json<serde_json::Value> {
-    let result = sqlx::query("SELECT id, name, created_at, updated_at FROM user")
+    let result = sqlx::query_as::<MySql, User>("SELECT id, CAST(name as CHAR) as name, created_at, updated_at FROM user LIMIT 20")
         .fetch_all(&pool)
         .await;
 
     match result {
-        Ok(result) => {
-            let mut data: Vec<UserEntity> = vec![];
-
-            for row in result {
-                let name: Vec<u8> = row.get(1);
-                let name = String::from_utf8(name).unwrap();
-                let created_at: chrono::NaiveDateTime = row.get(2);
-                let created_at = created_at.format("%Y-%m-%d %H:%M:%S").to_string();
-                let updated_at: chrono::NaiveDateTime = row.get(3);
-                let updated_at = updated_at.format("%Y-%m-%d %H:%M:%S").to_string();
-
-                let entity = UserEntity {
-                    id: row.get(0),
-                    name,
-                    created_at,
-                    updated_at
-                };
-
-                data.push(entity);
-            }
-
+        Ok(data) => {
             return Json(json!({
                 "code": 0,
                 "data": data,
