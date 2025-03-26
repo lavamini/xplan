@@ -1,5 +1,6 @@
 use axum::{
     extract::{Query, State},
+    http::Uri,
     Json,
     routing::get,
     Router
@@ -32,10 +33,18 @@ struct Employee {
 // employees
 async fn employees(
     State(pool): State<MySqlPool>,
-    Query(params): Query<Pagination>
+    uri: Uri
 ) -> Json<serde_json::Value> {
+    let params: Result<Query<Pagination>, _> = Query::try_from_uri(&uri);
+    if params.is_err() {
+        return Json(json!({
+            "code": 1,
+            "msg": "invalid parameters"
+        }))
+    }
+
     // parse pagination
-    let (_, page_size, offset) = parse_pagination(params);
+    let (_, page_size, offset) = parse_pagination(params.unwrap().0);
 
     let result = sqlx::query_as::<MySql, Employee>("SELECT t1.emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee t1 INNER JOIN (SELECT emp_no FROM employee ORDER BY emp_no LIMIT ?,?) t2 ON t1.emp_no = t2.emp_no")
         .bind(offset)
