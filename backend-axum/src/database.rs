@@ -11,6 +11,8 @@ pub async fn init_db_pool(conn_str: &str) -> Pool<MySql> {
         .min_connections(cpus * 2 + 1)
         .max_connections(cpus * 2 + 1)
         .acquire_timeout(Duration::from_secs(3))
+        // 禁用 test_before_acquire
+        .test_before_acquire(false)
         .connect(&conn_str)
         .await;
 
