@@ -1,4 +1,4 @@
-## Integrate multiple backend APIs with Go, Node.js and Rust
+## Multiple backend APIs with Rust, Go, and Node.js
 
 ### database
 ```sh
