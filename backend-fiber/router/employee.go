@@ -32,7 +32,7 @@ type EmployeeEntity struct {
 
 // employees
 func (u *Employee) employees(c *fiber.Ctx) error {
-	rows, err := database.Db.Query("SELECT emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee LIMIT 20")
+	rows, err := database.Db.Query("SELECT emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee LIMIT 1000,20")
 	if err != nil {
 		fmt.Printf("select employees error: %s\n", err.Error())
 		return c.JSON(fiber.Map{

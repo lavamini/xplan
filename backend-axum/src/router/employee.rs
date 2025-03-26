@@ -31,7 +31,7 @@ struct Employee {
 async fn employees(
     State(pool): State<MySqlPool>
 ) -> Json<serde_json::Value> {
-    let result = sqlx::query_as::<MySql, Employee>("SELECT emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee LIMIT 20")
+    let result = sqlx::query_as::<MySql, Employee>("SELECT emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee LIMIT 1000,20")
         .fetch_all(&pool)
         .await;
 
