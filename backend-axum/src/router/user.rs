@@ -156,7 +156,7 @@ async fn signup(
 #[derive(Serialize, sqlx::FromRow)]
 struct User {
     id: u64,
-    name: String,
+    name: bstr::BString,
     created_at: chrono::NaiveDateTime,
     updated_at: chrono::NaiveDateTime
 }
@@ -177,7 +177,7 @@ async fn users(
     // parse pagination
     let (_, page_size, offset) = parse_pagination(params.unwrap().0);
 
-    let result = sqlx::query_as::<_, User>("SELECT t1.id, CAST(name as CHAR) as name, created_at, updated_at FROM user t1 INNER JOIN (SELECT id FROM user ORDER BY id LIMIT ?,?) t2 ON t1.id = t2.id")
+    let result = sqlx::query_as::<_, User>("SELECT id, name, created_at, updated_at FROM user LIMIT ?,?")
         .bind(offset)
         .bind(page_size)
         .fetch_all(&pool)
