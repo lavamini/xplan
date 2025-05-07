@@ -142,7 +142,6 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "bcrypt",
- "bstr",
  "chrono",
  "num_cpus",
  "serde",
@@ -227,17 +226,6 @@ checksum = "e412e2cd0f2b2d93e02543ceae7917b3c70331573df19ee046bcbc35e45e87d7"
 dependencies = [
  "byteorder",
  "cipher",
-]
-
-[[package]]
-name = "bstr"
-version = "1.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "234113d19d0d7d613b40e86fb654acf958910802bcceab913a4f9e7cda03b1a4"
-dependencies = [
- "memchr",
- "regex-automata 0.4.9",
- "serde",
 ]
 
 [[package]]
@@ -1652,7 +1640,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f743f2a3cea30a58cd479013f75550e879009e3a02f616f18ca699335aa248c3"
 dependencies = [
  "base64",
- "bstr",
  "bytes",
  "chrono",
  "crc",

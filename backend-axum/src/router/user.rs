@@ -6,7 +6,7 @@ use axum::{
     Router
 };
 use serde::{Deserialize, Serialize};
-use serde_json::json;
+use serde_json::{json, Value};
 use sqlx::{MySqlPool, Row};
 
 use super::{parse_pagination, Pagination};
@@ -156,7 +156,7 @@ async fn signup(
 #[derive(Serialize, sqlx::FromRow)]
 struct User {
     id: u64,
-    name: bstr::BString,
+    name: Vec<u8>,
     created_at: chrono::NaiveDateTime,
     updated_at: chrono::NaiveDateTime
 }
@@ -184,7 +184,23 @@ async fn users(
         .await;
 
     match result {
-        Ok(data) => {
+        Ok(users) => {
+            let data: Vec<Value> = users
+            .into_iter()
+            .map(|user| {
+                // 将 JSON 数据从 Vec<u8> 转换为 String
+                let name_str = String::from_utf8(user.name.clone()).unwrap();
+
+                // 构造用户对象为 JSON
+                json!({
+                    "id": user.id,
+                    "name": name_str,
+                    "created_at": user.created_at,
+                    "updated_at": user.updated_at
+                })
+            })
+            .collect();
+
             return Json(json!({
                 "code": 0,
                 "data": data,
