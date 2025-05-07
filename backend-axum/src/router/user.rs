@@ -188,10 +188,9 @@ async fn users(
             let data: Vec<Value> = users
             .into_iter()
             .map(|user| {
-                // 将 JSON 数据从 Vec<u8> 转换为 String
-                let name_str = String::from_utf8(user.name.clone()).unwrap();
+                // Vec<u8> to String
+                let name_str = String::from_utf8(user.name).unwrap();
 
-                // 构造用户对象为 JSON
                 json!({
                     "id": user.id,
                     "name": name_str,
