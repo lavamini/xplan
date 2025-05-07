@@ -7,7 +7,7 @@ use axum::{
 };
 use serde::Serialize;
 use serde_json::json;
-use sqlx::{MySql, MySqlPool};
+use sqlx::MySqlPool;
 
 use super::{parse_pagination, Pagination};
 
@@ -46,7 +46,7 @@ async fn employees(
     // parse pagination
     let (_, page_size, offset) = parse_pagination(params.unwrap().0);
 
-    let result = sqlx::query_as::<MySql, Employee>("SELECT t1.emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee t1 INNER JOIN (SELECT emp_no FROM employee ORDER BY emp_no LIMIT ?,?) t2 ON t1.emp_no = t2.emp_no")
+    let result = sqlx::query_as::<_, Employee>("SELECT t1.emp_no, birth_date, first_name, last_name, gender, hire_date FROM employee t1 INNER JOIN (SELECT emp_no FROM employee ORDER BY emp_no LIMIT ?,?) t2 ON t1.emp_no = t2.emp_no")
         .bind(offset)
         .bind(page_size)
         .fetch_all(&pool)

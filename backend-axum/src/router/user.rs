@@ -7,7 +7,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::{MySql, MySqlPool, Row};
+use sqlx::{MySqlPool, Row};
 
 use super::{parse_pagination, Pagination};
 
@@ -177,7 +177,7 @@ async fn users(
     // parse pagination
     let (_, page_size, offset) = parse_pagination(params.unwrap().0);
 
-    let result = sqlx::query_as::<MySql, User>("SELECT t1.id, CAST(name as CHAR) as name, created_at, updated_at FROM user t1 INNER JOIN (SELECT id FROM user ORDER BY id LIMIT ?,?) t2 ON t1.id = t2.id")
+    let result = sqlx::query_as::<_, User>("SELECT t1.id, CAST(name as CHAR) as name, created_at, updated_at FROM user t1 INNER JOIN (SELECT id FROM user ORDER BY id LIMIT ?,?) t2 ON t1.id = t2.id")
         .bind(offset)
         .bind(page_size)
         .fetch_all(&pool)

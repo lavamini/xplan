@@ -1,7 +1,7 @@
-use sqlx::{Pool, mysql::{MySql, MySqlPoolOptions}};
+use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
 
 // conn_str: mysql://user:password@host:port/database
-pub async fn init_db_pool(conn_str: &str) -> Pool<MySql> {
+pub async fn init_db_pool(conn_str: &str) -> MySqlPool {
     tracing::debug!("connecting to database ...");
     // 获取 cpu 核心数（不包括超线程）
 	let cpus = num_cpus::get_physical() as u32;
