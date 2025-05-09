@@ -35,7 +35,7 @@ async fn main() {
     let db = config.db;
     let db_conn_str = format!("mysql://{}:{}@{}:{}/{}",
         db.user, db.password, db.host, db.port, db.database);
-    let pool = init_db_pool(db_conn_str.as_str()).await;
+    let pool = init_db_pool(db_conn_str.as_str(), db.min_conns, db.max_conns).await;
 
     // init router
     let app = init_router().with_state(pool);

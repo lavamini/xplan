@@ -5,8 +5,9 @@ use axum::{
     routing::{get, post},
     Router
 };
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::json;
 use sqlx::{MySqlPool, Row};
 
 use super::{parse_pagination, Pagination};
@@ -25,7 +26,7 @@ pub fn init_router() -> Router<MySqlPool> {
 #[derive(Deserialize)]
 struct UserForm {
     #[serde(default)]
-    name: String,
+    username: String,
     #[serde(default)]
     password: String
 }
@@ -35,30 +36,29 @@ async fn signin(
     State(pool): State<MySqlPool>,
     Json(user_form): Json<UserForm>
 ) -> Json<serde_json::Value> {
-    let name = user_form.name.trim();
+    let username = user_form.username.trim();
     let password = user_form.password.trim();
 
-    if name == "" || password == "" {
+    if username == "" || password == "" {
         return Json(json!({
             "code": 1,
             "msg": "parameters missing"
         }))
     }
 
-    let password_hash = sqlx::query("SELECT password_hash FROM user WHERE name = ?")
-        .bind(name)
+    let db_result = sqlx::query("SELECT password_hash FROM user WHERE username = ?")
+        .bind(username)
         .fetch_one(&pool)
         .await;
 
-    let password_hash = match password_hash {
-        Ok(password_hash) => {
-            let hash_str: Vec<u8> = password_hash.get(0);
-            String::from_utf8(hash_str).unwrap()
+    let password_hash = match db_result {
+        Ok(db_row) => {
+            db_row.try_get::<String, _>("password_hash").unwrap()
         },
         Err(sqlx::Error::RowNotFound) => {
             return Json(json!({
                 "code": 1,
-                "msg": "name or password not correct"
+                "msg": "username or password not correct"
             }))
         },
         Err(err) => {
@@ -79,7 +79,7 @@ async fn signin(
     } else {
         return Json(json!({
             "code": 1,
-            "msg": "name or password not correct"
+            "msg": "username or password not correct"
         }))
     }
 }
@@ -89,26 +89,26 @@ async fn signup(
     State(pool): State<MySqlPool>,
     Json(user_form): Json<UserForm>
 ) -> Json<serde_json::Value> {
-    let name = user_form.name.trim();
+    let username = user_form.username.trim();
     let password = user_form.password.trim();
 
-    if name == "" || password == "" {
+    if username == "" || password == "" {
         return Json(json!({
             "code": 1,
             "msg": "parameters missing"
         }))
     }
 
-    let result = sqlx::query("SELECT id FROM user WHERE name = ?")
-        .bind(name)
+    let db_result = sqlx::query("SELECT id FROM user WHERE username = ?")
+        .bind(username)
         .fetch_one(&pool)
         .await;
 
-    match result {
+    match db_result {
         Ok(_) => {
             return Json(json!({
                 "code": 1,
-                "msg": "name already exist"
+                "msg": "username already exist"
             }))
         },
         Err(sqlx::Error::RowNotFound) => {
@@ -124,18 +124,14 @@ async fn signup(
     };
 
     let password_hash = bcrypt::hash(password, 10).unwrap();
-    let created_at = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-    let updated_at = created_at.clone();
 
-    let result = sqlx::query("INSERT INTO user(name, password_hash, created_at, updated_at) VALUES(?, ?, ?, ?)")
-        .bind(name)
+    let db_result = sqlx::query("INSERT INTO user(username, password_hash) VALUES(?, ?)")
+        .bind(username)
         .bind(password_hash)
-        .bind(created_at)
-        .bind(updated_at)
         .execute(&pool)
         .await;
 
-    match result {
+    match db_result {
         Ok(_) => {
             return Json(json!({
                 "code": 0,
@@ -156,9 +152,9 @@ async fn signup(
 #[derive(Serialize, sqlx::FromRow)]
 struct User {
     id: u64,
-    name: Vec<u8>,
-    created_at: chrono::NaiveDateTime,
-    updated_at: chrono::NaiveDateTime
+    username: String,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>
 }
 
 // users
@@ -177,33 +173,25 @@ async fn users(
     // parse pagination
     let (_, page_size, offset) = parse_pagination(params.unwrap().0);
 
-    let result = sqlx::query_as::<_, User>("SELECT id, name, created_at, updated_at FROM user LIMIT ?,?")
+    let sql_str;
+    if offset < 10000 {
+        sql_str = "SELECT id, username, created_at, updated_at FROM user LIMIT ?,?";
+    } else {
+        sql_str = "SELECT t1.id, username, created_at, updated_at FROM user t1, (SELECT id FROM user LIMIT ?,?) t2 WHERE t1.id = t2.id";
+    }
+
+    let db_result = sqlx::query_as::<_, User>(sql_str)
         .bind(offset)
         .bind(page_size)
         .fetch_all(&pool)
         .await;
 
-    match result {
+    match db_result {
         Ok(users) => {
-            let data: Vec<Value> = users
-            .into_iter()
-            .map(|user| {
-                // Vec<u8> to String
-                let name_str = String::from_utf8(user.name).unwrap();
-
-                json!({
-                    "id": user.id,
-                    "name": name_str,
-                    "created_at": user.created_at,
-                    "updated_at": user.updated_at
-                })
-            })
-            .collect();
-
             return Json(json!({
                 "code": 0,
-                "data": data,
-                "msg": "success"
+                "msg": "success",
+                "data": users
             }))
         },
         Err(err) => {

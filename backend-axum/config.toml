@@ -4,3 +4,5 @@ port = 3306
 user = "root"
 password = "testpass"
 database = "xplan"
+min_conns = 2
+max_conns = 10

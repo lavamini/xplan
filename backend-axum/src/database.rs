@@ -1,14 +1,12 @@
 use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
 
 // conn_str: mysql://user:password@host:port/database
-pub async fn init_db_pool(conn_str: &str) -> MySqlPool {
+pub async fn init_db_pool(conn_str: &str, min_conns: u32, max_conns: u32) -> MySqlPool {
     tracing::debug!("connecting to database ...");
-    // 获取 cpu 核心数（不包括超线程）
-	let cpus = num_cpus::get_physical() as u32;
 
     let pool = MySqlPoolOptions::new()
-        .min_connections(cpus * 2 + 1)
-        .max_connections(cpus * 2 + 1)
+        .min_connections(min_conns)
+        .max_connections(max_conns)
         // 禁用 test_before_acquire
         .test_before_acquire(false)
         .connect(&conn_str)

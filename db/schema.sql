@@ -1,12 +1,12 @@
 CREATE TABLE user (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARBINARY(32) NOT NULL,
-    `password_hash` VARBINARY(254) NOT NULL,
-    `created_at` DATETIME NOT NULL,
-    `updated_at` DATETIME NOT NULL,
+    `username` VARCHAR(32) NOT NULL,
+    `password_hash` VARCHAR(255) NOT NULL,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    UNIQUE KEY (name),
+    UNIQUE KEY (username),
     KEY (created_at),
     KEY (updated_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
