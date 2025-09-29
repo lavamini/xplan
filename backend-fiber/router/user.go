@@ -27,7 +27,7 @@ func (u *User) SetupRouter(app *fiber.App) {
 
 // user form
 type UserForm struct {
-	Name     string `json:"name"`
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
@@ -42,17 +42,17 @@ func (u *User) signin(c *fiber.Ctx) error {
 		})
 	}
 
-	name := strings.TrimSpace(userForm.Name)
+	username := strings.TrimSpace(userForm.Username)
 	password := strings.TrimSpace(userForm.Password)
 
-	if name == "" || password == "" {
+	if username == "" || password == "" {
 		return c.JSON(fiber.Map{
 			"code": 1,
 			"msg":  "parameters missing",
 		})
 	}
 
-	rows, err := database.Db.Query("SELECT password_hash FROM user WHERE name = ?", name)
+	rows, err := database.Db.Query("SELECT password_hash FROM user WHERE username = ?", username)
 	if err != nil {
 		fmt.Printf("select user error: %s\n", err.Error())
 		return c.JSON(fiber.Map{
@@ -70,7 +70,7 @@ func (u *User) signin(c *fiber.Ctx) error {
 		if err != nil {
 			return c.JSON(fiber.Map{
 				"code": 1,
-				"msg":  "name or password not correct",
+				"msg":  "username or password not correct",
 			})
 		} else {
 			// signin success
@@ -82,7 +82,7 @@ func (u *User) signin(c *fiber.Ctx) error {
 	} else {
 		return c.JSON(fiber.Map{
 			"code": 1,
-			"msg":  "name or password not correct",
+			"msg":  "username or password not correct",
 		})
 	}
 }
@@ -98,17 +98,17 @@ func (u *User) signup(c *fiber.Ctx) error {
 		})
 	}
 
-	name := strings.TrimSpace(userForm.Name)
+	username := strings.TrimSpace(userForm.Username)
 	password := strings.TrimSpace(userForm.Password)
 
-	if name == "" || password == "" {
+	if username == "" || password == "" {
 		return c.JSON(fiber.Map{
 			"code": 1,
 			"msg":  "parameters missing",
 		})
 	}
 
-	rows, err := database.Db.Query("SELECT id FROM user WHERE name = ?", name)
+	rows, err := database.Db.Query("SELECT id FROM user WHERE username = ?", username)
 	if err != nil {
 		fmt.Printf("select user error: %s\n", err.Error())
 		return c.JSON(fiber.Map{
@@ -120,7 +120,7 @@ func (u *User) signup(c *fiber.Ctx) error {
 	if rows.Next() {
 		return c.JSON(fiber.Map{
 			"code": 1,
-			"msg":  "name already exist",
+			"msg":  "username already exist",
 		})
 	} else {
 		bytes, err := bcrypt.GenerateFromPassword([]byte(password), 10)
@@ -134,7 +134,7 @@ func (u *User) signup(c *fiber.Ctx) error {
 			created_at := time.Now().Format("2006-01-02 15:04:05")
 			updated_at := created_at
 
-			_, err := database.Db.Exec("INSERT INTO user(name, password_hash, created_at, updated_at) VALUES(?, ?, ?, ?)", name, password_pash, created_at, updated_at)
+			_, err := database.Db.Exec("INSERT INTO user(username, password_hash, created_at, updated_at) VALUES(?, ?, ?, ?)", username, password_pash, created_at, updated_at)
 			if err != nil {
 				fmt.Printf("insert user error: %s\n", err.Error())
 				return c.JSON(fiber.Map{
@@ -155,7 +155,7 @@ func (u *User) signup(c *fiber.Ctx) error {
 // user entity
 type UserEntity struct {
 	Id        uint64 `json:"id"`
-	Name      string `json:"name"`
+	Username  string `json:"username"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
@@ -171,7 +171,7 @@ func (u *User) users(c *fiber.Ctx) error {
 	}
 
 	_, page_size, offset := ParsePagination(params)
-	rows, err := database.Db.Query("SELECT id, name, created_at, updated_at FROM user LIMIT ?,?", offset, page_size)
+	rows, err := database.Db.Query("SELECT id, username, created_at, updated_at FROM user LIMIT ?,?", offset, page_size)
 	if err != nil {
 		fmt.Printf("select users error: %s\n", err.Error())
 		return c.JSON(fiber.Map{
@@ -184,14 +184,14 @@ func (u *User) users(c *fiber.Ctx) error {
 
 	for rows.Next() {
 		var id uint64
-		var name string
+		var username string
 		var created_at, updated_at sql.NullTime
 
-		rows.Scan(&id, &name, &created_at, &updated_at)
+		rows.Scan(&id, &username, &created_at, &updated_at)
 
 		userEntity := UserEntity{
 			Id:        id,
-			Name:      name,
+			Username:  username,
 			CreatedAt: created_at.Time.Format("2006-01-02 15:04:05"),
 			UpdatedAt: updated_at.Time.Format("2006-01-02 15:04:05"),
 		}
