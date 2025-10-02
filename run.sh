@@ -1,5 +1,7 @@
+#!/bin/bash
+
 if [ $# -eq 0 ]; then
-    printf "\x1b[31mUsage:\x1b[0m ./run.sh <axum | fiber | koa>\n"
+    printf "Usage: ./run.sh <axum | fiber | koa>\n"
 else
     if [ "$1" == "axum" ]; then
         cd backend-axum
@@ -17,6 +19,6 @@ else
         node app.js
         cd ..
     else
-        printf "\x1b[31mUsage:\x1b[0m ./run.sh <axum | fiber | koa>\n"
+        printf "Usage: ./run.sh <axum | fiber | koa>\n"
     fi
 fi
