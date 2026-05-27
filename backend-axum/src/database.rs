@@ -1,12 +1,12 @@
 use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
 
 // conn_str: mysql://user:password@host:port/database
-pub async fn init_db_pool(conn_str: &str, min_conns: u32, max_conns: u32) -> MySqlPool {
+pub async fn init_db_pool(conn_str: &str, min_connections: u32, max_connections: u32) -> MySqlPool {
     tracing::debug!("connecting to database ...");
 
     let pool = MySqlPoolOptions::new()
-        .min_connections(min_conns)
-        .max_connections(max_conns)
+        .min_connections(min_connections)
+        .max_connections(max_connections)
         // 禁用 test_before_acquire
         .test_before_acquire(false)
         .connect(&conn_str)

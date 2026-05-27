@@ -10,8 +10,8 @@ pub struct Db {
     pub user: String,
     pub password: String,
     pub database: String,
-    pub min_conns: u32,
-    pub max_conns: u32,
+    pub min_connections: u32,
+    pub max_connections: u32,
 }
 
 #[derive(Deserialize)]
