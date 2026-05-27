@@ -136,9 +136,9 @@ router.post('/signup', async (ctx, next) => {
 
 // users
 router.get('/users', async (ctx, next) => {
-    // async db query
+    // async db execute
     const results = await new Promise(resolve => {
-        ctx.db_pool.query(
+        ctx.db_pool.execute(
             'SELECT id, username, created_at, updated_at FROM user LIMIT 20',
             (error, results, fields) => {
                 if (error) {
