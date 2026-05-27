@@ -4,6 +4,8 @@
         "port": 3306,
         "user": "root",
         "password": "testpass",
-        "database": "xplan"
+        "database": "xplan",
+        "connectionLimit": 10,
+        "maxIdle": 10
     }
 }

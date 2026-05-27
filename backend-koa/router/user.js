@@ -7,19 +7,19 @@ router.prefix('/api');
 
 // signin
 router.post('/signin', async (ctx, next) => {
-    let name = ctx.request.body.name || '';
+    let username = ctx.request.body.username || '';
     let password = ctx.request.body.password || '';
 
-    name = name.trim();
+    username = username.trim();
     password = password.trim();
 
-    if (name == '' || password == '') {
+    if (username == '' || password == '') {
         ctx.body = { code: 1, msg: 'parameters missing' };
     } else {
-        // async db query
+        // async db execute
         const results = await new Promise(resolve => {
-            ctx.db_pool.query(
-                "SELECT password_hash FROM user WHERE name='" + name + "'",
+            ctx.db_pool.execute(
+                "SELECT password_hash FROM user WHERE username = ?", [username],
                 (error, results, fields) => {
                     if (error) {
                         console.error('select user error: ' + error);
@@ -33,7 +33,7 @@ router.post('/signin', async (ctx, next) => {
         if (results == undefined) {
             ctx.body = { code: 1, msg: 'signin failed' };
         } else if (results.length == 0) {
-            ctx.body = { code: 1, msg: 'name or password not correct' };
+            ctx.body = { code: 1, msg: 'username or password not correct' };
         } else {
             const password_hash = results[0].password_hash.toString();
             // async password compare
@@ -52,7 +52,7 @@ router.post('/signin', async (ctx, next) => {
             } else if (b_match) {
                 ctx.body = { code: 0, msg: 'signin success' };
             } else {
-                ctx.body = { code: 1, msg: 'name or password not correct' };
+                ctx.body = { code: 1, msg: 'username or password not correct' };
             }
         }
     }
@@ -60,19 +60,19 @@ router.post('/signin', async (ctx, next) => {
 
 // signup
 router.post('/signup', async (ctx, next) => {
-    let name = ctx.request.body.name || '';
+    let username = ctx.request.body.username || '';
     let password = ctx.request.body.password || '';
 
-    name = name.trim();
+    username = username.trim();
     password = password.trim();
 
-    if (name == '' || password == '') {
+    if (username == '' || password == '') {
         ctx.body = { code: 1, msg: 'parameters missing' };
     } else {
-        // async db query
+        // async db execute
         const match_rows = await new Promise(resolve => {
-            ctx.db_pool.query(
-                "SELECT id FROM user WHERE name='" + name + "'",
+            ctx.db_pool.execute(
+                "SELECT id FROM user WHERE username = ?", [username],
                 (error, results, fields) => {
                     if (error) {
                         console.error('select user error: ' + error);
@@ -86,7 +86,7 @@ router.post('/signup', async (ctx, next) => {
         if (match_rows == -1) {
             ctx.body = { code: 1, msg: 'signup failed' };
         } else if (match_rows > 0) {
-            ctx.body = { code: 1, msg: 'name already exist' };
+            ctx.body = { code: 1, msg: 'username already exist' };
         } else {
             // async password hash
             const password_hash = await new Promise(resolve => {
@@ -104,7 +104,7 @@ router.post('/signup', async (ctx, next) => {
             } else {
                 const created_at = moment().format('YYYY-MM-DD HH:mm:ss');
                 const user = {
-                    name,
+                    username,
                     password_hash,
                     created_at,
                     updated_at: created_at
@@ -139,7 +139,7 @@ router.get('/users', async (ctx, next) => {
     // async db query
     const results = await new Promise(resolve => {
         ctx.db_pool.query(
-            'SELECT id, name, created_at, updated_at FROM user LIMIT 20',
+            'SELECT id, username, created_at, updated_at FROM user LIMIT 20',
             (error, results, fields) => {
                 if (error) {
                     console.error('select user error: ' + error);
@@ -154,15 +154,15 @@ router.get('/users', async (ctx, next) => {
         ctx.body = { code: 1, msg: 'get users failed' };
     } else {
         for (let i in results) {
-            results[i].name = results[i].name.toString();
+            results[i].username = results[i].username.toString();
             results[i].created_at = moment(results[i].created_at).format('YYYY-MM-DD HH:mm:ss');
             results[i].updated_at = moment(results[i].updated_at).format('YYYY-MM-DD HH:mm:ss');
         }
 
         ctx.body = {
             code: 0,
+            msg: 'success',
             data: results,
-            msg: 'success'
         }
     }
 });
