@@ -5,7 +5,7 @@
         "user": "root",
         "password": "testpass",
         "database": "xplan",
-        "connectionLimit": 10,
-        "maxIdle": 10
+        "min_connections": 10,
+        "max_connections": 10
     }
 }

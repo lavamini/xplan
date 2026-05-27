@@ -18,7 +18,15 @@ app.use(bodyParser());
 app.use(registerRouter('router'))
 
 const db_config = config.get('db');
-app.context.db_pool  = mysql.createPool(db_config);
+app.context.db_pool  = mysql.createPool({
+    host: db_config['host'] || 'localhost',
+    port: db_config['port'] || 3306,
+    user: db_config['user'] || 'root',
+    password: db_config['password'],
+    database: db_config['database'],
+    maxIdle: db_config['min_connections'] || 10,
+    connectionLimit: db_config['max_connections'] || 10,
+});
 
 console.log('⇨ koa server listening on \x1b[32m' + port + '\x1b[0m');
 app.listen(port);
