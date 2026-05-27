@@ -29,3 +29,10 @@ func ParsePagination(params *Pagination) (int, int, int) {
 	offset := (page - 1) * page_size
 	return page, page_size, offset
 }
+
+// Response
+type Response[T any] struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+	Data T      `json:"data"`
+}

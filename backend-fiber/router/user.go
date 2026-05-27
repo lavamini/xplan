@@ -199,9 +199,9 @@ func (u *User) users(c *fiber.Ctx) error {
 		userEntityArray = append(userEntityArray, userEntity)
 	}
 
-	return c.JSON(fiber.Map{
-		"code": 0,
-		"data": userEntityArray,
-		"msg":  "success",
+	return c.JSON(Response[[]UserEntity]{
+		Code: 0,
+		Msg:  "success",
+		Data: userEntityArray,
 	})
 }

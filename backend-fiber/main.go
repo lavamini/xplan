@@ -37,7 +37,7 @@ func main() {
 	db := config.Db
 	connStr := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?loc=Local&parseTime=true",
 		db.User, db.Password, db.Host, db.Port, db.Database)
-	err = database.InitDatabase(connStr)
+	err = database.InitDatabase(connStr, db.MinConnections, db.MaxConnections)
 	if err != nil {
 		fmt.Printf("init database error: %s\n", err.Error())
 		return
